@@ -1,7 +1,20 @@
 
 ## Setup Instructions
 
+npm install
+php artisan migrate --seed
+npm run dev
+visit http://tpm.test (declared in .env)
 
+## Design
 
-## Description
+Users are able to view projects from the projects page.
+They can view any project, but must be authorized to edit them, as well as view and edit tasks.
+Tasks can be seen and accessed from specific project page.
+On tasks page users can view info about task and edit it.
 
+## Relationships:
+
+Several users can work on one project, each user can have many projects (many-to-many)
+
+Task assigned to one user in one project, user can have multiple tasks, as well as project (many-to-one)
