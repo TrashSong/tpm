@@ -18,7 +18,7 @@ class Project extends Model
 
     public function users(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, foreignPivotKey: 'projects_id');
+        return $this->belongsToMany(User::class);
     }
 
     public function tasks(): HasMany

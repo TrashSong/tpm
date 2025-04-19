@@ -11,7 +11,7 @@ class ProjectController extends Controller
 {
     public function index()
     {
-        $project = Project::with('user')->latest()->simplePaginate(5);
+        $project = Project::with('users')->latest()->simplePaginate(5);
 
         return view('projects.index', [
             'projects' => $project
@@ -32,16 +32,17 @@ class ProjectController extends Controller
     {
         request()->validate([
             'name' => ['required'],
-            'description' => ['required']
+            'shortDescription' => ['required']
         ]);
     
-        Project::create([
+        $project = Project::create([
             'name' => request('name'),
-            'description' => request('description'),
-            'user_id' => Auth::user()->id
+            'shortDescription' => request('shortDescription')
         ]);
+
+        $project->users()->attach(Auth::id());
     
-        return redirect('/projects');
+        return redirect('/projects/' . $project->id);
     }
 
     public function edit(Project $project)
@@ -53,12 +54,12 @@ class ProjectController extends Controller
     {
         request()->validate([
             'name' => ['required'],
-            'description' => ['required']
+            'shortDescription' => ['required']
         ]);
     
         $project->update([
             'name' => request('name'),
-            'description' => request('description'),
+            'shortDescription' => request('shortDescription'),
         ]);
     
         return redirect('/projects/' . $project->id);

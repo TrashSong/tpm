@@ -1,7 +1,7 @@
 <?php
 
 use App\Models\Project;
-use App\Models\Tag;
+use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,16 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tags', function (Blueprint $table) {
+        Schema::create('project_user', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->timestamps();
-        });
-
-        Schema::create('project_tag', function (Blueprint $table) {
-            $table->id();
+            $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete();
             $table->foreignIdFor(Project::class)->constrained()->cascadeOnDelete();
-            $table->foreignIdFor(Tag::class)->constrained()->cascadeOnDelete();
             $table->timestamps();
         });
     }
@@ -32,7 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('tags');
-        Schema::dropIfExists('project_tag');
+        Schema::dropIfExists('project_user');
     }
 };

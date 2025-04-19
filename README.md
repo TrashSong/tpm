@@ -2,7 +2,9 @@
 ## Setup Instructions
 
 npm install
+npm install tailwindcss @tailwindcss/vite
 php artisan migrate --seed
+npm run build
 npm run dev
 visit http://tpm.test (declared in .env)
 

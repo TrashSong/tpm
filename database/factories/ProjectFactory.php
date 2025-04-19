@@ -18,7 +18,7 @@ class ProjectFactory extends Factory
     {
         return [
             'name' => fake()->text(20),
-            'shortDescripton' => fake()->text(200),
+            'shortDescription' => fake()->text(200),
         ];
     }
 }

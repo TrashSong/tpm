@@ -3,60 +3,82 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Project;
 use App\Models\Task;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
-    public function index()
+    public function index(Project $project)
     {
-        $task = Task::with('user')->latest()->simplePaginate(5);
+        $tasks = $project->tasks()->with('user')->latest()->simplePaginate(5);
 
-        return view('projects.tasks.index', [
-            'tasks' => $task
-        ]); // view for project tasks listings page
+        return view('tasks.index', [
+            'tasks' => $tasks,
+            'project' => $project
+        ]);
     }
 
-    public function create()
+    public function create(Project $project)
     {
-        return view('projects.tasks.create'); // view for project task creation page
+        $users = $project->users()->get();
+        
+        return view('tasks.create', [
+            'users' => $users,
+            'project' => $project
+        ]);
     }
 
-    public function show(Task $task)
+    public function show(Project $project, Task $task)
     {
-        return view('projects.tasks.show', ['task' => $task]); // view for specific project task page
+        abort_unless($task->project_id == $project->id, 404);
+
+        return view('tasks.show', [
+            'task' => $task,
+            'project' => $project
+        ]); // view for specific project task page
     }
 
-    public function store()
+    public function store(Project $project)
     {
         request()->validate([
             'name' => ['required'],
             'description' => ['required'],
-            'status' => ['required'],
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed'])],
             'user_id' => ['required']
         ]);
     
-        Task::create([
+        $task = Task::create([
             'name' => request('name'),
             'description' => request('description'),
             'status' => request('status'),
-            'user_id' => request('user_id')
+            'user_id' => request('user_id'),
+            'project_id' => $project->id
         ]);
     
-        return redirect('/projects/{project}/tasks');
+        return redirect()->route('tasks.index', $project);
     }
 
-    public function edit(Task $task)
+    public function edit(Project $project, Task $task)
     {
-        return view('projects.tasks.edit', ['task' => $task]); // view for task edit page
+        abort_unless($task->project_id == $project->id, 404);
+
+        $users = $project->users()->get();
+
+        return view('tasks.edit', [
+            'task' => $task,
+            'users' => $users,
+            'project' => $project
+        ]); // view for task edit page
     }
 
-    public function update(Task $task)
+    public function update(Project $project, Task $task)
     {
         request()->validate([
             'name' => ['required'],
             'description' => ['required'],
-            'status' => ['required'],
+            'status' => ['required', Rule::in(['pending', 'in_progress', 'completed'])],
             'user_id' => ['required']
         ]);
     
@@ -67,13 +89,13 @@ class TaskController extends Controller
             'user_id' => request('user_id')
         ]);
     
-        return redirect('/projects/{project}/tasks/' . $task->id);
+        return redirect()->route('tasks.show', [$project, $task]);
     }
 
-    public function destroy(Task $task)
+    public function destroy(Project $project, Task $task)
     {
         $task->delete();
 
-        return redirect('/projects/{project}/tasks');
+        return redirect()->route('tasks.index', $project);
     }
 }
