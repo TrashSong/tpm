@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::view('/', 'welcome');
 
 Route::get('/projects', [ProjectController::class, 'index']);
-Route::get('/projects/create', [ProjectController::class, 'create']);
+Route::get('/projects/create', [ProjectController::class, 'create'])->middleware('auth');
 Route::post('/projects', [ProjectController::class, 'store'])->middleware('auth');
 Route::get('/projects/{project}', [ProjectController::class, 'show']);
 Route::get('/projects/{project}/edit', [ProjectController::class, 'edit'])->middleware('auth')->can('update', 'project');
